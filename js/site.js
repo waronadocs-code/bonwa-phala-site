@@ -206,9 +206,59 @@
   const LODGES = { main: { name: 'Main Lodge', cap: 30, rooms: 10 }, bush: { name: 'Bush Lodge', cap: 20 } };
   const rand = n => 'R' + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   const plural = (n, w) => `${n} ${w}${n > 1 ? 's' : ''}`;
-  const today = new Date();
-  f('arrive').min = [today.getFullYear(), String(today.getMonth() + 1).padStart(2, '0'), String(today.getDate()).padStart(2, '0')].join('-');
+  const pad = n => String(n).padStart(2, '0');
+  const now = new Date();
+  const TODAY = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+  const addDays = (s, n) => { const d = new Date(s + 'T00:00:00Z'); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   const nice = v => { const [y, m, d] = v.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('en-ZA', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }); };
+
+  /* availability: booked nights per lodge, from /api/availability */
+  const avail = {}; // lodge -> nights map | 'loading' | 'error'
+  function loadAvailability(lodge, force) {
+    if (avail[lodge] && !force) return;
+    avail[lodge] = 'loading';
+    fetch(`/api/availability?lodge=${lodge}&from=${TODAY}&to=${addDays(TODAY, 400)}`)
+      .then(r => (r.ok ? r.json() : Promise.reject(r.status)))
+      .then(d => { avail[lodge] = d.nights; update(); })
+      .catch(() => { avail[lodge] = 'error'; update(); });
+  }
+  // 'full' = can't stay this night with the current choice; 'part' = some rooms taken.
+  function nightState(d, s) {
+    const map = avail[form.elements.lodge.value];
+    const b = map && typeof map === 'object' && map[d];
+    if (!b) return null;
+    if (b.full || s.whole || (b.left != null && b.left < s.rooms)) return 'full';
+    return 'part';
+  }
+  function badNights(s) {
+    const a = f('arrive').value, out = [];
+    if (a) for (let i = 0; i < s.nights; i++) { const d = addDays(a, i); if (nightState(d, s) === 'full') out.push(d); }
+    return out;
+  }
+
+  // With under a week left in this month, open the calendar on next month.
+  const leftThisMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate();
+  const cal = BonwaCalendar(f('cal'), {
+    min: TODAY,
+    start: leftThisMonth < 6 ? addDays(TODAY, leftThisMonth + 1) : TODAY,
+    months: 1,
+    day: d => {
+      const s = state(), st = nightState(d, s), a = f('arrive').value, end = a && addDays(a, s.nights);
+      return {
+        disabled: st === 'full',
+        pressed: d === a,
+        label: st === 'full' ? 'booked' : st === 'part' ? 'some rooms booked' : '',
+        cls: [st === 'full' && 'is-full', st === 'part' && 'is-part', a && d === a && 'is-start',
+              a && d > a && d < end && 'is-in', a && d === end && 'is-end'].filter(Boolean).join(' '),
+      };
+    },
+    onPick: d => {
+      f('arrive').value = f('arrive').value === d ? '' : d;
+      update();
+      cal.focusDay();
+    },
+  });
+  f('arriveClear').addEventListener('click', () => { f('arrive').value = ''; update(); cal.focusDay(); });
 
   function state() {
     const L = LODGES[form.elements.lodge.value] || LODGES.main;
@@ -254,11 +304,97 @@
     f('waLink').href = 'https://wa.me/27761300915?text=' + encodeURIComponent(compose());
     f('mailLink').href = 'mailto:bookings@bonwaphala.africa?subject=' + encodeURIComponent(whole ? `Quote request: whole ${L.name}` : `Booking enquiry: ${L.name}`) + '&body=' + encodeURIComponent(compose());
     f('copyFallback').hidden = true;
+
+    // calendar and date checks
+    const s = state(), a = f('arrive').value, map = avail[form.elements.lodge.value];
+    if (!book.hidden) loadAvailability(form.elements.lodge.value);
+    cal.render();
+    f('arriveText').textContent = a ? `${nice(a)} → ${nice(addDays(a, nights))}` : 'Flexible dates (pick an arrival day, or leave it open)';
+    f('arriveClear').hidden = !a;
+    f('calLegend').hidden = !(map && typeof map === 'object');
+    const bad = badNights(s);
+    f('dateNote').hidden = !bad.length;
+    if (bad.length) f('dateNote').textContent = `${bad.length === 1 ? 'One night is' : 'Some nights are'} already booked (${bad.map(nice).join(', ')}). Try other dates${whole ? ', or book by the room' : ' or fewer rooms'}.`;
+    f('sendBtn').disabled = bad.length > 0;
   }
   form.addEventListener('input', update);
   form.addEventListener('change', update);
-  form.addEventListener('submit', e => e.preventDefault());
   f('copyBtn').addEventListener('click', e => copyText(compose(), e.currentTarget, f('copyFallback')));
+
+  /* sending the enquiry */
+  const FIELD = { name: 'gname', email: 'gemail', phone: 'gphone', guests: 'guests', nights: 'nights', rooms: 'rooms', arrival: 'cal' };
+  function clearErrors() {
+    $$('.fld.has-err', form).forEach(el => el.classList.remove('has-err'));
+    $$('.fld-err', form).forEach(el => el.remove());
+    f('formMsg').hidden = true;
+  }
+  function showErrors(errors) {
+    let first = null;
+    Object.entries(errors || {}).forEach(([k, msg]) => {
+      const input = FIELD[k] && f(FIELD[k]);
+      const box = input && input.closest('.fld');
+      if (!box) return;
+      box.classList.add('has-err');
+      const m = document.createElement('small');
+      m.className = 'fld-err';
+      m.textContent = msg;
+      box.appendChild(m);
+      first = first || input;
+    });
+    if (first) (first.id === 'cal' ? cal.focusDay() : first.focus());
+  }
+  function formMessage(text) { f('formMsg').textContent = text; f('formMsg').hidden = false; }
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    clearErrors();
+    const s = state();
+    const payload = {
+      lodge: form.elements.lodge.value, stay: s.whole ? 'whole' : 'rooms', arrival: f('arrive').value || null,
+      nights: s.nights, rooms: s.whole ? null : s.rooms, guests: s.guests, occasion: f('occasion').value,
+      name: f('gname').value.trim(), email: f('gemail').value.trim(), phone: f('gphone').value.trim(),
+      message: f('gmsg').value.trim(), website: f('website').value,
+    };
+    const local = {};
+    if (payload.name.length < 2) local.name = 'Enter your name.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(payload.email)) local.email = 'Enter a valid email address so we can reply.';
+    if (Object.keys(local).length) { showErrors(local); return; }
+
+    const btn = f('sendBtn'), label = btn.querySelector('span');
+    btn.disabled = true;
+    label.textContent = 'Sending…';
+    try {
+      const r = await fetch('/api/enquiries', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok) {
+        f('sentName').textContent = payload.name ? ', ' + payload.name.split(/\s+/)[0] : '';
+        f('sentText').textContent = d.emailed === false
+          ? 'Your enquiry is in. Laruchelle will reply to confirm availability, usually within a day.'
+          : 'We’ve emailed you a copy. Laruchelle will reply to confirm availability, usually within a day.';
+        f('bookBody').hidden = true;
+        f('sent').hidden = false;
+        f('sent').focus();
+        return;
+      }
+      if (r.status === 409) { loadAvailability(payload.lodge, true); }
+      showErrors(d.errors);
+      formMessage(d.error || 'We couldn’t send your enquiry. Please use WhatsApp or email below instead.');
+    } catch (err) {
+      formMessage('We couldn’t reach our booking system. Please send your enquiry on WhatsApp or by email below instead.');
+    } finally {
+      label.textContent = 'Send enquiry';
+      btn.disabled = badNights(state()).length > 0;
+    }
+  });
+  f('sendAnother').addEventListener('click', () => {
+    f('sent').hidden = true;
+    f('bookBody').hidden = false;
+    f('arrive').value = '';
+    f('gmsg').value = '';
+    clearErrors();
+    update();
+    form.querySelector('input:checked').focus();
+  });
 
   let returnTo = null;
   function openBook(btn) {
@@ -268,10 +404,12 @@
     if (stay) form.elements.stay.value = stay;
     if (occ) f('occasion').value = occ;
     setMenu(false);
+    f('sent').hidden = true;
+    f('bookBody').hidden = false;
     book.hidden = false;
     document.documentElement.classList.add('locked');
     update();
-    setTimeout(() => (which ? f('arrive') : form.querySelector('input:checked')).focus(), 60);
+    setTimeout(() => (which ? cal.focusDay() : form.querySelector('input:checked').focus()), 60);
   }
   function closeBook() {
     book.hidden = true;

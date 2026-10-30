@@ -1,0 +1,59 @@
+/* Admin page. Builds on site.css (colours, fonts, pills, fields, calendar). */
+.adm{background:var(--mist)}
+.adm-top{display:flex;align-items:center;gap:18px;padding:14px var(--gr) 14px var(--gl);background:var(--ink);color:var(--sun)}
+.adm-brand img{width:96px;height:auto}
+.adm-title{flex:1;margin:0;font:400 30px/1 var(--f-display);text-transform:uppercase;letter-spacing:.01em}
+.adm-top .pill-line{color:var(--sun)}
+.adm-top .pill-line:hover{background:var(--sun);color:var(--ink)}
+.adm-main{max-width:1180px;margin:0 auto;padding:28px var(--gr) 80px var(--gl)}
+.adm-card{display:grid;gap:16px;align-content:start;padding:clamp(20px,2.4vw,30px);border-radius:20px;background:var(--paper)}
+.adm-card h1,.adm-card h2{margin:0;font:400 clamp(36px,4vw,52px)/.9 var(--f-display);text-transform:uppercase}
+.adm-login{display:grid;place-items:center;min-height:60vh}
+.adm-login .adm-card{width:min(420px,100%)}
+.adm-help{margin:0;font-size:14px;line-height:1.45;color:var(--ink-soft)}
+.adm-empty{margin:24px 0;font-size:16px;color:var(--ink-soft)}
+.adm-tabs{display:flex;gap:6px;margin-bottom:22px;border-bottom:1.5px solid var(--rule-strong)}
+.adm-tabs button{padding:12px 18px;border:0;background:none;font:600 14px/1 var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1.5px}
+.adm-tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--ink)}
+.adm-tabs b{display:inline-grid;place-items:center;min-width:20px;height:20px;margin-left:6px;padding:0 6px;border-radius:999px;background:var(--ember);color:var(--white);font-size:11.5px}
+.adm-tabs b:empty{display:none}
+.adm .chips{margin-bottom:18px}
+
+/* enquiry list */
+.enq-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.enq details{border-radius:16px;background:var(--paper);overflow:hidden}
+.enq summary{display:grid;grid-template-columns:auto minmax(0,1.1fr) minmax(0,1.6fr) auto;gap:16px;align-items:center;padding:16px 20px;cursor:pointer;list-style:none}
+.enq summary::-webkit-details-marker{display:none}
+.enq summary:hover{background:var(--white)}
+.enq summary small{display:block;margin-top:3px;font-size:13px;color:var(--ink-soft)}
+.enq summary b{font-weight:600}
+.enq-rate{font:400 26px/1 var(--f-display)}
+.badge{padding:6px 10px;border-radius:999px;font:600 11px/1 var(--f-body);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.b-new{background:var(--ember);color:var(--white)}
+.b-contacted{background:var(--sun);color:var(--ink)}
+.b-confirmed{background:var(--ink);color:var(--sun)}
+.b-declined,.b-cancelled{background:var(--rule);color:var(--ink-soft)}
+.enq-body{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;padding:4px 20px 22px;border-top:1px solid var(--rule)}
+.enq-body dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:16px 0 0;font-size:15px}
+.enq-body dt{font:600 11.5px/1.6 var(--f-body);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.enq-body dd{margin:0;overflow-wrap:anywhere}
+.enq-msg{white-space:pre-wrap}
+.enq-edit{display:grid;gap:12px;align-content:start;padding-top:16px}
+
+/* calendar & blocks */
+.adm-seg{max-width:420px;margin-bottom:12px}
+.adm-cal{margin:14px 0 26px;padding:18px}
+.adm-cal .cal-day{cursor:default;max-height:52px}
+.adm-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.block-list{list-style:none;margin:0;padding:0;display:grid}
+.block-list li{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--rule)}
+.block-list small{display:block;margin-top:3px;font-size:13.5px;color:var(--ink-soft)}
+.block-list .x{flex:none;width:36px;height:36px}
+
+@media (max-width:800px){
+  .enq summary{grid-template-columns:auto 1fr;gap:8px 12px}
+  .enq-what{grid-column:1/-1}
+  .enq-rate{grid-column:1/-1;font-size:22px}
+  .enq-body,.adm-grid{grid-template-columns:1fr}
+  .adm-title{font-size:24px}
+}

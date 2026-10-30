@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en-ZA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Bookings admin · Bonwa Phala Game Lodge</title>
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..700&family=League+Gothic&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/admin.css">
+</head>
+<body class="adm">
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-arrow" viewBox="0 0 16 16"><path d="M2 8h11.2M9.2 3.6 13.6 8l-4.4 4.4" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-wa" viewBox="0 0 24 24"><path d="M3.6 20.4l1.3-4.3A8.6 8.6 0 1 1 8 19.2z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/><path d="M9.1 7.6c.3-.3.8-.3 1 .1l.9 1.7c.2.3.1.7-.1 1l-.6.6c.6 1.3 1.6 2.3 2.9 2.9l.6-.6c.3-.3.7-.3 1-.1l1.7.9c.4.2.4.7.1 1-.7.8-1.7 1.2-2.7.9-2.6-.8-4.8-3-5.6-5.6-.3-1 .1-2 .8-2.8z" fill="currentColor"/></symbol>
+</svg>
+
+<header class="adm-top">
+  <a class="adm-brand" href="index.html"><img src="img/logo.png" width="595" height="361" alt="Bonwa Phala Game Lodge"></a>
+  <p class="adm-title">Bookings admin</p>
+  <button class="pill pill-line" type="button" id="logout" hidden>Log out</button>
+</header>
+
+<main class="adm-main">
+
+  <section class="adm-login" id="loginView" hidden aria-labelledby="loginTitle">
+    <form id="loginForm" class="adm-card">
+      <h1 id="loginTitle">Log in</h1>
+      <label class="fld"><span>Password</span><input type="password" id="password" autocomplete="current-password" required></label>
+      <p class="form-msg" id="loginMsg" role="alert" hidden></p>
+      <button class="pill pill-ink" type="submit"><svg><use href="#i-arrow"/></svg>Log in</button>
+    </form>
+  </section>
+
+  <section id="dash" hidden>
+    <nav class="adm-tabs" role="tablist" aria-label="Admin sections">
+      <button type="button" role="tab" id="tabEnq" aria-controls="enqPanel" aria-selected="true">Enquiries <b id="newCount"></b></button>
+      <button type="button" role="tab" id="tabCal" aria-controls="calPanel" aria-selected="false">Calendar</button>
+    </nav>
+
+    <div id="enqPanel" role="tabpanel" aria-labelledby="tabEnq">
+      <div class="chips" role="group" aria-label="Filter by status" id="statusChips"></div>
+      <p class="adm-empty" id="enqEmpty" hidden>No enquiries here yet.</p>
+      <ul class="enq-list" id="enqList"></ul>
+    </div>
+
+    <div id="calPanel" role="tabpanel" aria-labelledby="tabCal" hidden>
+      <div class="seg adm-seg" role="group" aria-label="Lodge">
+        <label><input type="radio" name="calLodge" value="main" checked><span>Main Lodge</span></label>
+        <label><input type="radio" name="calLodge" value="bush"><span>Bush Lodge</span></label>
+      </div>
+      <p class="adm-help">Booked nights come from confirmed enquiries and the blocks below. Striped = fully booked, dot = some rooms taken.</p>
+      <div class="cal adm-cal" id="admCal"></div>
+
+      <div class="adm-grid">
+        <form class="adm-card" id="blockForm" novalidate>
+          <h2>Block dates</h2>
+          <p class="adm-help">For bookings taken by phone, maintenance or private use.</p>
+          <label class="fld" data-f="lodge"><span>Lodge</span>
+            <select id="bLodge"><option value="main">Main Lodge</option><option value="bush">Bush Lodge</option></select>
+          </label>
+          <div class="duo">
+            <label class="fld" data-f="startDate"><span>First night</span><input type="date" id="bStart" required></label>
+            <label class="fld" data-f="endDate"><span>Check-out</span><input type="date" id="bEnd" required></label>
+          </div>
+          <label class="fld" data-f="rooms"><span>Rooms <em>leave empty for the whole lodge</em></span><input type="number" id="bRooms" min="1" max="40" inputmode="numeric"></label>
+          <label class="fld"><span>Note <em>optional</em></span><input type="text" id="bNote" maxlength="300" placeholder="e.g. Smith family, phone booking"></label>
+          <p class="form-msg" id="blockMsg" role="alert" hidden></p>
+          <button class="pill pill-ink" type="submit"><svg><use href="#i-arrow"/></svg>Add block</button>
+        </form>
+        <div class="adm-card">
+          <h2>Upcoming blocks</h2>
+          <p class="adm-empty" id="blockEmpty" hidden>No blocked dates.</p>
+          <ul class="block-list" id="blockList"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="js/calendar.js"></script>
+<script src="js/admin.js"></script>
+</body>
+</html>

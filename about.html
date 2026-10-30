@@ -197,9 +197,15 @@
     <div class="book-head">
       <h2 id="bookTitle">Plan your stay</h2>
       <button class="x" type="button" data-close="" aria-label="Close"><svg><use href="#i-x"/></svg></button>
-      <p>Pick a lodge, your dates and how many rooms, then send the enquiry to Laruchelle on WhatsApp or by email.</p>
+      <p>Pick a lodge, your dates and how many rooms. We’ll email you to confirm, usually within a day.</p>
     </div>
-    <div class="book-body">
+    <div class="sent" id="sent" tabindex="-1" hidden>
+      <p class="kicker">Enquiry sent</p>
+      <h3>Thank you<span id="sentName"></span>!</h3>
+      <p id="sentText">We’ve emailed you a copy. Laruchelle will reply to confirm availability, usually within a day.</p>
+      <div class="actions"><button class="pill pill-ink" type="button" data-close="">Back to the site</button><button class="pill pill-line" type="button" id="sendAnother">Send another enquiry</button></div>
+    </div>
+    <div class="book-body" id="bookBody">
       <fieldset class="lodge-pick">
         <legend>Lodge</legend>
         <label><input type="radio" name="lodge" id="lodgeMain" value="main" checked><span class="opt"><b>Main Lodge</b><small>10 en-suite chalets · up to 30 guests</small></span></label>
@@ -212,7 +218,17 @@
           <label><input type="radio" name="stay" value="whole"><span>Whole lodge</span></label>
         </div>
       </fieldset>
-      <label class="fld"><span>Arrival</span><input type="date" id="arrive"></label>
+      <div class="fld cal-fld">
+        <span id="arriveLbl">Arrival</span>
+        <input type="hidden" id="arrive">
+        <div class="cal" id="cal" role="group" aria-labelledby="arriveLbl"></div>
+        <div class="cal-foot">
+          <p class="cal-pick" id="arriveText" aria-live="polite">Flexible dates</p>
+          <button type="button" class="link-btn" id="arriveClear" hidden>Clear date</button>
+        </div>
+        <p class="cal-legend" id="calLegend" hidden><span><i class="lg lg-full"></i>Booked</span><span><i class="lg lg-part"></i>Few rooms left</span></p>
+        <p class="cap-note" id="dateNote" hidden></p>
+      </div>
       <div class="trio">
         <label class="fld"><span>Nights</span><input type="number" id="nights" min="1" max="60" value="2" inputmode="numeric"></label>
         <label class="fld" id="roomsFld"><span>Rooms</span><input type="number" id="rooms" min="1" max="10" value="2" inputmode="numeric"></label>
@@ -229,17 +245,27 @@
           <option>Hunting package</option>
         </select>
       </label>
-      <label class="fld"><span>Your name</span><input type="text" id="gname" autocomplete="name" placeholder="First and last name"></label>
+      <label class="fld" data-f="name"><span>Your name</span><input type="text" id="gname" autocomplete="name" placeholder="First and last name" required maxlength="120"></label>
+      <div class="duo">
+        <label class="fld" data-f="email"><span>Email</span><input type="email" id="gemail" autocomplete="email" placeholder="you@example.com" required maxlength="200"></label>
+        <label class="fld" data-f="phone"><span>Phone <em>optional</em></span><input type="tel" id="gphone" autocomplete="tel" placeholder="082 123 4567" maxlength="40"></label>
+      </div>
+      <label class="hp" aria-hidden="true">Website<input type="text" id="website" tabindex="-1" autocomplete="off"></label>
       <label class="fld"><span>Anything else</span><textarea id="gmsg" rows="3" placeholder="Catering, game drives, dietary needs…"></textarea></label>
       <div class="est" aria-live="polite">
         <span class="est-k" id="estK">Estimated rate</span>
         <strong id="est">R6,000</strong>
         <small id="estNote">2 rooms × 2 nights × R1,500 per room, per night.</small>
       </div>
+      <p class="form-msg" id="formMsg" role="alert" hidden></p>
       <div class="actions">
-        <a class="pill pill-ink" id="waLink" href="https://wa.me/27761300915" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>Send on WhatsApp</a>
-        <a class="pill pill-line" id="mailLink" href="mailto:bookings@bonwaphala.africa">Send by email</a>
-        <button class="pill pill-line" type="button" id="copyBtn">Copy enquiry</button>
+        <button class="pill pill-ink" type="submit" id="sendBtn"><svg><use href="#i-arrow"/></svg><span>Send enquiry</span></button>
+      </div>
+      <div class="alt">
+        <span>Or send it yourself:</span>
+        <a class="pill pill-line" id="waLink" href="https://wa.me/27761300915" target="_blank" rel="noopener"><svg><use href="#i-wa"/></svg>WhatsApp</a>
+        <a class="pill pill-line" id="mailLink" href="mailto:bookings@bonwaphala.africa">Email</a>
+        <button class="pill pill-line" type="button" id="copyBtn">Copy</button>
       </div>
       <textarea class="copy-fallback" id="copyFallback" aria-label="Enquiry text to copy" readonly hidden></textarea>
       <p class="fine">Rooms are R1,500 per room, per night. Whole-lodge bookings are quoted on an ad hoc basis. Catering is available on request. Enquiries go to <span>bookings@bonwaphala.africa</span>.</p>
@@ -247,6 +273,7 @@
   </form>
 </div>
 
+<script src="js/calendar.js"></script>
 <script src="js/site.js"></script>
 
 </body></html>

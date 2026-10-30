@@ -1,0 +1,17 @@
+{
+  "name": "bonwa-phala-site",
+  "private": true,
+  "type": "module",
+  "description": "Bonwa Phala Game Lodge website with booking enquiries, availability and admin",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "node scripts/dev-server.mjs",
+    "test": "node --test",
+    "db:setup": "node scripts/db-setup.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.0"
+  }
+}

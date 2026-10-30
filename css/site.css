@@ -442,6 +442,56 @@ a.chip{display:inline-flex;align-items:center;text-decoration:none}
   .collage img,.shot img{transition:none}
 }
 
+/* ---------- booking: calendar, contact fields, sending ---------- */
+.cal-fld{display:grid;gap:0}
+.cal{position:relative;padding:12px;border-radius:16px;background:var(--white);box-shadow:inset 0 0 0 1.5px var(--rule-strong)}
+.cal-nav{position:absolute;top:8px;right:8px;display:flex;gap:4px}
+.cal-btn{width:34px;height:34px;border-radius:50%;border:0;background:transparent;color:var(--ink);display:grid;place-items:center;cursor:pointer}
+.cal-btn:hover{background:var(--mist)}
+.cal-btn:disabled{opacity:.3;cursor:default;background:none}
+.cal-btn svg{width:15px;height:15px}
+.cal-prev svg{transform:scaleX(-1)}
+.cal-months{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.cal-title{margin:6px 0 10px 4px;font:400 26px/1 var(--f-display);text-transform:uppercase;letter-spacing:.01em}
+.cal-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px}
+.cal-wd{padding:4px 0;text-align:center;font:600 10.5px/1 var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.cal-day{display:grid;place-items:center;width:100%;aspect-ratio:1;max-height:44px;border:0;border-radius:10px;background:none;font:500 14.5px/1 var(--f-body);color:var(--ink);cursor:pointer;position:relative;padding:0}
+button.cal-day:not(.is-start):not(.is-in):not(.is-end):hover{background:var(--mist)}
+.cal-day.is-part::after{content:"";position:absolute;bottom:5px;width:5px;height:5px;border-radius:50%;background:var(--ember)}
+.cal-day.is-full{color:var(--ink-soft);background:repeating-linear-gradient(135deg,transparent 0 4px,rgba(27,20,12,.09) 4px 6px);text-decoration:line-through}
+.cal-day.is-off{cursor:not-allowed;opacity:.45}
+.cal-day.is-full.is-off{opacity:.7}
+button.cal-day.is-off:hover{background:none}
+.cal-day.is-in{background:var(--sun-pale);border-radius:0}
+.cal-day.is-start{background:var(--ink);color:var(--sun);border-radius:10px 0 0 10px}
+.cal-day.is-end{background:var(--sun-pale);border-radius:0 10px 10px 0;box-shadow:inset -2px 0 0 var(--ink)}
+.cal-day.is-start.is-end{border-radius:10px}
+.cal-day:focus-visible{outline:3px solid var(--ink);outline-offset:1px;z-index:1}
+.cal-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:10px}
+.cal-pick{margin:0;font-size:14.5px;font-weight:600}
+.link-btn{border:0;background:none;padding:4px 0;font:600 13px/1 var(--f-body);color:var(--ember);text-decoration:underline;cursor:pointer;white-space:nowrap}
+.cal-legend{display:flex;flex-wrap:wrap;gap:6px 16px;margin:8px 0 0;font-size:13px;color:var(--ink-soft)}
+.cal-legend span{display:inline-flex;align-items:center;gap:6px}
+.lg{display:inline-block;width:14px;height:14px;border-radius:4px}
+.lg-full{background:repeating-linear-gradient(135deg,var(--white) 0 3px,rgba(27,20,12,.25) 3px 5px);box-shadow:inset 0 0 0 1px var(--rule-strong)}
+.lg-part{width:7px;height:7px;border-radius:50%;background:var(--ember);margin:0 3px}
+.cal-fld .cap-note{margin:8px 0 0}
+.duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.fld>span em{font-style:normal;font-weight:500;letter-spacing:.04em;text-transform:none;opacity:.8}
+.hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+.fld.has-err input,.fld.has-err .cal{box-shadow:inset 0 0 0 2px var(--ember)}
+.fld-err{display:block;margin-top:6px;font-size:13.5px;font-weight:600;color:var(--ember)}
+.form-msg{margin:0;padding:12px 14px;border-radius:12px;background:var(--sun-pale);font-size:14.5px;line-height:1.4;font-weight:600}
+.actions .pill:disabled{opacity:.45;cursor:not-allowed}
+.alt{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:14px;color:var(--ink-soft)}
+.alt span{margin-right:2px}
+.alt .pill{height:36px;padding:0 14px;font-size:12px}
+.sent{padding:32px max(24px, env(safe-area-inset-right, 0px)) calc(env(safe-area-inset-bottom, 0px) + 32px) 28px;display:grid;gap:14px;outline:none}
+.sent .kicker{margin:0;color:var(--ember)}
+.sent h3{margin:0;font:400 clamp(48px,7vw,72px)/.86 var(--f-display);text-transform:uppercase}
+.sent p{margin:0;font-size:16px;line-height:1.5;max-width:42ch}
+.sent .actions{margin-top:8px}
+
 /* ---------- responsive ---------- */
 @media (max-width:960px){
   .menu-links a:not(.pill){padding:9px 7px;font-size:14px}

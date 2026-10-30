@@ -1,0 +1,6 @@
+# Not part of the public site. api/ is kept: Vercel builds it into functions.
+scripts/
+test/
+db/
+README.md
+.env*
